@@ -27,7 +27,9 @@ try:
 except ImportError:
     POSTGRES_AVAILABLE = False
 
+print("[BOOT] Module app.py loading...", flush=True)
 load_dotenv()
+print("[BOOT] Dotenv loaded.", flush=True)
 
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -407,13 +409,13 @@ class AppStore(FleetStoreMixin, InventoryStoreMixin, QCLabStoreMixin, UserStoreM
             # Revert keepalives since setsockopt might fail in Render sandboxed containers
             self.pg_pool = ThreadedConnectionPool(1, 20, self.db_url)
         else:
-            print(f"[{now_str()}] AppStore: Using SQLite at {self.db_path}")
+            print(f"[{now_str()}] AppStore: Using SQLite at {self.db_path}", flush=True)
         
-        print(f"[{now_str()}] AppStore: Initializing DB schema...")
+        print(f"[{now_str()}] AppStore: Initializing DB schema...", flush=True)
         self._init_db()
-        print(f"[{now_str()}] AppStore: Bootstrapping data...")
+        print(f"[{now_str()}] AppStore: Bootstrapping data...", flush=True)
         self._bootstrap(csv_file)
-        print(f"[{now_str()}] AppStore: Ready.")
+        print(f"[{now_str()}] AppStore: Ready.", flush=True)
 
     def _conn(self):
         if self.is_postgres:
@@ -2260,6 +2262,7 @@ class AppStore(FleetStoreMixin, InventoryStoreMixin, QCLabStoreMixin, UserStoreM
 
 
 def create_app(base_dir: Path, csv_file: str | None = None) -> Flask:
+    print(f"[BOOT] create_app() started at {now_str()}", flush=True)
     app = Flask(__name__)
     app.config["JSON_AS_ASCII"] = False
     app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -2269,7 +2272,9 @@ def create_app(base_dir: Path, csv_file: str | None = None) -> Flask:
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.config["SESSION_COOKIE_SECURE"] = bool(int(os.getenv("SESSION_COOKIE_SECURE", "0")))
     db_url = os.getenv("DATABASE_URL")
+    print(f"[BOOT] DATABASE_URL detected: {bool(db_url)}", flush=True)
     store = AppStore(base_dir=base_dir, csv_file=csv_file, db_url=db_url)
+    print("[BOOT] AppStore initialized.", flush=True)
 
     def _api_unauthorized(msg: str, status: int):
         return jsonify({"ok": False, "error": msg}), status
