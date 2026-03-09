@@ -1536,10 +1536,10 @@ function exportConsultaReport() {
   <div class="page">
     <div class="head">
       <div class="head-brand">
-        <img class="head-logo" src="${escapeHtml(BRAND_LOGO_URL)}" alt="ALMEX">
+        <img class="head-logo" src="${escapeHtml(BRAND_LOGO_URL)}" alt="FIRME CONCRETOS">
         <div>
           <h1>Reporte de Consulta Mix</h1>
-          <p class="brand">ALMEX</p>
+          <p class="brand">FIRME CONCRETOS</p>
         </div>
       </div>
       <p class="head-meta">Generado: ${escapeHtml(reportDate)} | Archivo: ${escapeHtml(state.file || "-")}</p>
@@ -1599,7 +1599,7 @@ function exportConsultaReport() {
       </article>
     </section>
 
-    <div class="sign">ForMix by Labsico - Dise&#241;a-Dosifica-Calcula</div>
+    <div class="sign">ForMix by Firme Concretos - Diseña-Dosifica-Calcula</div>
   </div>
 </body>
 </html>`;
