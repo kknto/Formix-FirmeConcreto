@@ -392,6 +392,9 @@ from user_store import UserStoreMixin
 class AppStore(FleetStoreMixin, InventoryStoreMixin, QCLabStoreMixin, UserStoreMixin):
     def __init__(self, base_dir: Path, csv_file: str | None = None, db_url: str | None = None):
         self.base_dir = base_dir.resolve()
+        # Render provides postgres:// but SQLAlchemy/psycopg2 prefers postgresql://
+        if db_url and db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
         self.db_url = db_url
         self.db_path = self.base_dir / "mix_data.sqlite3"
         self.snapshot_dir = self.base_dir / "backups" / "db_snapshots"
@@ -2488,6 +2491,7 @@ def create_app(base_dir: Path, csv_file: str | None = None) -> Flask:
             "allowed_views": allowed_views(user["role"]),
             "can_edit": user["role"] in EDITOR_ROLES,
             "can_edit_qc_humidity": user["role"] in QC_HUMIDITY_ROLES,
+            "is_postgres": store.is_postgres,
             "csrf_token": ensure_csrf_token(),
         }
         return render_template("index.html", cache_bust=int(datetime.now().timestamp()), auth_boot=auth_boot)
@@ -2505,6 +2509,7 @@ def create_app(base_dir: Path, csv_file: str | None = None) -> Flask:
                 "allowed_views": allowed_views(user["role"]),
                 "can_edit": user["role"] in EDITOR_ROLES,
                 "can_edit_qc_humidity": user["role"] in QC_HUMIDITY_ROLES,
+                "is_postgres": store.is_postgres,
                 "csrf_token": ensure_csrf_token(),
             }
         )

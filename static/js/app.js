@@ -2986,7 +2986,8 @@ async function saveDoserParams() {
     state.doser.params = normalizeDoserParams(payload.values);
     syncDoserParamInputs();
     renderDosificador();
-    setStatus("Parametros de dosificacion guardados.", "ok");
+    const dbType = window.auth_boot && window.auth_boot.is_postgres ? "PostgreSQL" : "SQLite";
+    setStatus(`Parametros de dosificacion guardados en ${dbType}.`, "ok");
   } catch (error) {
     setStatus(String(error), "err");
   } finally {
@@ -3026,7 +3027,8 @@ async function saveQcData() {
     renderEditorQcTable();
     renderDosificador();
     if (state.selectedQueryRow !== null) renderRecipeAndCosts(state.rows[state.selectedQueryRow]);
-    setStatus("Control de Calidad guardado.", "ok");
+    const dbType = window.auth_boot && window.auth_boot.is_postgres ? "PostgreSQL" : "SQLite";
+    setStatus(`Control de Calidad guardado en ${dbType}.`, "ok");
   } catch (error) {
     setStatus(String(error), "err");
   } finally {
@@ -3524,7 +3526,8 @@ async function saveData() {
       state.version = Number(payload.version);
     }
     setDirty(false);
-    setStatus("Cambios guardados en SQLite.", "ok");
+    const dbType = window.auth_boot && window.auth_boot.is_postgres ? "PostgreSQL" : "SQLite";
+    setStatus(`Cambios guardados en ${dbType}.`, "ok");
     await loadData();
   } catch (error) {
     setStatus(String(error), "err");
