@@ -66,7 +66,7 @@ const state = {
 const MOD_DATE_HEADER = "FECHA_MODIF";
 const QC_AGGREGATES = ["Fino 1", "Fino 2", "Grueso 1", "Grueso 2"];
 const QC_FIELDS = ["pvs", "pvc", "densidad", "absorcion", "humedad"];
-const BRAND_LOGO_URL = `${window.location.origin}/static/img/logo_almex.png`;
+const BRAND_LOGO_URL = `${window.location.origin}/static/img/logo_firme_concreto.jpeg`;
 const MUTATING_HTTP_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 const tableHead = document.querySelector("#csvTable thead");
@@ -1896,10 +1896,10 @@ function buildDoserReportHtml(rawSnapshot, reportDate) {
   <div class="sheet">
     <div class="head">
       <div class="head-brand">
-        <img class="head-logo" src="${escapeHtml(BRAND_LOGO_URL)}" alt="ALMEX">
+        <img class="head-logo" src="${escapeHtml(BRAND_LOGO_URL)}" alt="FIRME CONCRETOS">
         <div>
           <h1>Reporte de Dosificador</h1>
-          <p class="brand">ALMEX</p>
+          <p class="brand">FIRME CONCRETOS</p>
         </div>
       </div>
       <p class="sub">Generado: ${escapeHtml(reportDate)} | Archivo: ${escapeHtml(snap.file)}</p>
