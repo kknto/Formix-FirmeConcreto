@@ -400,10 +400,17 @@ class AppStore(FleetStoreMixin, InventoryStoreMixin, QCLabStoreMixin, UserStoreM
         self.is_postgres = bool(db_url and POSTGRES_AVAILABLE)
         self.pg_pool = None
         if self.is_postgres:
+            print(f"[{now_str()}] AppStore: Initializing PostgreSQL pool with URL: {self.db_url[:20]}...")
             # Revert keepalives since setsockopt might fail in Render sandboxed containers
             self.pg_pool = ThreadedConnectionPool(1, 20, self.db_url)
+        else:
+            print(f"[{now_str()}] AppStore: Using SQLite at {self.db_path}")
+        
+        print(f"[{now_str()}] AppStore: Initializing DB schema...")
         self._init_db()
+        print(f"[{now_str()}] AppStore: Bootstrapping data...")
         self._bootstrap(csv_file)
+        print(f"[{now_str()}] AppStore: Ready.")
 
     def _conn(self):
         if self.is_postgres:
@@ -2456,6 +2463,19 @@ def create_app(base_dir: Path, csv_file: str | None = None) -> Flask:
     def logout():
         session.clear()
         return redirect(url_for("login"))
+
+    @app.get("/health")
+    def health_check():
+        return jsonify({"status": "ok", "timestamp": now_str()}), 200
+
+    @app.get("/api/debug/db")
+    def api_debug_db():
+        return jsonify({
+            "is_postgres": store.is_postgres,
+            "postgres_available": POSTGRES_AVAILABLE,
+            "db_path": str(store.db_path) if not store.is_postgres else "remote",
+            "db_url_present": bool(os.getenv("DATABASE_URL"))
+        })
 
     @app.get("/")
     @login_required
