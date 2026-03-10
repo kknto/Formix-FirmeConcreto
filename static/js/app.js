@@ -68,6 +68,35 @@ const QC_AGGREGATES = ["Fino 1", "Fino 2", "Grueso 1", "Grueso 2"];
 const QC_FIELDS = ["pvs", "pvc", "densidad", "absorcion", "humedad"];
 const BRAND_LOGO_URL = `${window.location.origin}/static/img/logo_firme_concreto.jpeg`;
 const MUTATING_HTTP_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+const APP_TIMEZONE = APP_BOOT.app_timezone || "America/Cancun";
+
+function datePartsInTimeZone(date = new Date(), timeZone = APP_TIMEZONE) {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(date);
+  const map = {};
+  parts.forEach((part) => {
+    if (part.type !== "literal") map[part.type] = part.value;
+  });
+  return map;
+}
+
+function todayInAppTimezone() {
+  const p = datePartsInTimeZone();
+  return `${p.year}-${p.month}-${p.day}`;
+}
+
+function dateTimeInAppTimezone() {
+  const p = datePartsInTimeZone();
+  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`;
+}
 
 const tableHead = document.querySelector("#csvTable thead");
 const tableBody = document.querySelector("#csvTable tbody");
@@ -3112,7 +3141,7 @@ async function loadData() {
     state.rows = payload.rows || [];
 
     // Initialize date filters to today
-    const today = new Date().toISOString().split("T")[0];
+    const today = todayInAppTimezone();
     if (dRemisionDate) dRemisionDate.value = today;
     if (remFilterDate) remFilterDate.value = today;
 
@@ -3796,6 +3825,9 @@ if (tabUsuarios) {
 // --- Exports for other modules (e.g., fleet.js, inventory.js, users.js) ---
 window.AppGlobals = {
   state,
+  appTimezone: APP_TIMEZONE,
+  todayInAppTimezone,
+  dateTimeInAppTimezone,
   escapeHtml,
   formatNum,
   canAccessView,
@@ -3816,4 +3848,3 @@ window.AppGlobals = {
 applyRoleAccessUi();
 switchView(defaultView());
 loadData();
-

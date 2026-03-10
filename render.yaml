@@ -16,6 +16,10 @@ services:
         value: 1
       - key: APP_SECRET_KEY
         value: Formix#2026!SecretKey
+      - key: APP_TIMEZONE
+        value: America/Cancun
+      - key: TZ
+        value: America/Cancun
 
 databases:
   - name: formix-firme-db

@@ -1,5 +1,6 @@
 import uuid
 import datetime
+from time_utils import now_str, today_str
 
 class QCLabStoreMixin:
     def list_qc_samples(self, limit: int = 100) -> list[dict]:
@@ -39,12 +40,13 @@ class QCLabStoreMixin:
         with self.lock:
             with self._conn() as conn:
                 sample_id = payload.get("id")
-                now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                now = now_str()
+                today = today_str()
                 
                 if not sample_id:
                     code = payload.get("sample_code")
                     if not code or str(code).strip() == "":
-                        code = f"M-{now[:10]}-{uuid.uuid4().hex[:4]}"
+                        code = f"M-{today}-{uuid.uuid4().hex[:4]}"
                     cur = conn.execute(
                         """
                         INSERT INTO qc_samples (
@@ -54,7 +56,7 @@ class QCLabStoreMixin:
                         """,
                         (
                             code,
-                            payload.get("cast_date", now[:10]),
+                            payload.get("cast_date", today),
                             payload.get("remision_id", ""),
                             float(payload.get("fc_expected", 250)),
                             float(payload.get("slump_cm", 0)),
@@ -70,7 +72,7 @@ class QCLabStoreMixin:
                         raise Exception("No se pudo crear la muestra.")
                     
                     # Create baseline cylinders
-                    cast_date_dt = datetime.datetime.strptime(payload.get("cast_date", now[:10]), "%Y-%m-%d")
+                    cast_date_dt = datetime.datetime.strptime(payload.get("cast_date", today), "%Y-%m-%d")
                     ages = payload.get("cylinder_ages", []) # array of ints
                     for age in ages:
                         exp_date = (cast_date_dt + datetime.timedelta(days=int(age))).strftime("%Y-%m-%d")
@@ -134,7 +136,7 @@ class QCLabStoreMixin:
     def test_qc_cylinder(self, cylinder_id: int, payload: dict, image_path: str = "") -> dict:
         with self.lock:
             with self._conn() as conn:
-                now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                now = now_str()
                 status = payload.get("status", "ensayado")
                 strength = float(payload.get("strength_kgcm2", 0))
                 notes = payload.get("notes", "")

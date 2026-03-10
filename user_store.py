@@ -1,5 +1,5 @@
 from werkzeug.security import generate_password_hash
-import datetime
+from time_utils import now_str
 
 class UserStoreMixin:
     def list_users(self) -> list:
@@ -13,7 +13,7 @@ class UserStoreMixin:
         username = payload.get("username", "").strip().lower()
         role = payload.get("role", "operador")
         is_active = payload.get("is_active", 1)
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now = now_str()
 
         with self.lock:
             with self._conn() as conn:
@@ -58,7 +58,7 @@ class UserStoreMixin:
         if not new_password:
             raise ValueError("La nueva contraseña no puede estar vacía")
         password_hash = generate_password_hash(new_password)
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now = now_str()
         with self.lock:
             with self._conn() as conn:
                 cur = conn.execute(

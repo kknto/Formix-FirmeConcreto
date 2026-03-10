@@ -12,6 +12,7 @@
     state,
     escapeHtml,
     formatNum,
+    todayInAppTimezone,
     canAccessView,
     switchView,
     tabInventario,
@@ -658,7 +659,7 @@
   if (printDailyReportBtn) printDailyReportBtn.addEventListener("click", printDailyReport);
 
   if (invDailyReportDate) {
-    invDailyReportDate.value = new Date().toISOString().split('T')[0];
+    invDailyReportDate.value = todayInAppTimezone();
   }
 
 })(window.AppGlobals);

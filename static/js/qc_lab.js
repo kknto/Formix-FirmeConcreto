@@ -2,6 +2,17 @@ let stateQcCylinders = [];
 let sampleAges = [3, 7, 14, 28]; // Default ages for a native sample
 let currentTestCylinderId = null;
 
+function todayInAppTimezone() {
+    if (window.AppGlobals && typeof window.AppGlobals.todayInAppTimezone === "function") {
+        return window.AppGlobals.todayInAppTimezone();
+    }
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+}
+
 async function lookupRemision() {
     const remNo = document.getElementById("qcRemisionNo").value.trim();
     if (!remNo) {
@@ -84,7 +95,7 @@ function renderQcDashboard() {
     let overdue = 0;
     let totalPending = 0;
 
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = todayInAppTimezone();
 
     stateQcCylinders.forEach(cyl => {
         if (cyl.status === "pendiente") {
@@ -381,7 +392,7 @@ function setupListeners() {
             const formData = new FormData();
             formData.append("strength_kgcm2", document.getElementById("testStrength").value);
             formData.append("notes", document.getElementById("testNotes").value);
-            formData.append("break_date", new Date().toISOString().split("T")[0]);
+            formData.append("break_date", todayInAppTimezone());
             formData.append("status", "ensayado");
 
             if (currentCompressedFile) {
