@@ -632,7 +632,7 @@ function switchView(view) {
   if (isFleet) loadFleetData();
   if (isInv && typeof window.loadInventoryData === "function") window.loadInventoryData();
   if (isLab && typeof window.loadQcLabData === "function") window.loadQcLabData();
-  if (isUsers && typeof window.AppUsers !== "undefined" && typeof window.AppUsers.loadUsers === "function") window.AppUsers.loadUsers();
+  if (isUser && typeof window.AppUsers !== "undefined" && typeof window.AppUsers.loadUsers === "function") window.AppUsers.loadUsers();
 }
 
 function compareValues(a, b) {
@@ -3792,13 +3792,8 @@ if (tabUsuarios) {
   tabUsuarios.addEventListener("click", () => switchView("usuarios"));
 }
 
-applyRoleAccessUi();
-switchView(defaultView());
-loadData();
 
-
-
-// --- Exports for other modules (e.g., fleet.js) ---
+// --- Exports for other modules (e.g., fleet.js, inventory.js, users.js) ---
 window.AppGlobals = {
   state,
   escapeHtml,
@@ -3817,4 +3812,8 @@ window.AppGlobals = {
   openRemisionReport,
   uiConfirm
 };
+
+applyRoleAccessUi();
+switchView(defaultView());
+loadData();
 
