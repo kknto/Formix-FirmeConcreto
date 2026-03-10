@@ -67,6 +67,8 @@ const MOD_DATE_HEADER = "FECHA_MODIF";
 const QC_AGGREGATES = ["Fino 1", "Fino 2", "Grueso 1", "Grueso 2"];
 const QC_FIELDS = ["pvs", "pvc", "densidad", "absorcion", "humedad"];
 const BRAND_LOGO_URL = `${window.location.origin}/static/img/logo_firme_concreto.jpeg`;
+const LABSICO_LOGO_URL = `${window.location.origin}/static/img/Labsico-Logo.jpg`;
+const CO_BRAND_TEXT = "ForMIX by LABSICO";
 const MUTATING_HTTP_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 const APP_TIMEZONE = APP_BOOT.app_timezone || "America/Cancun";
 
@@ -274,14 +276,20 @@ function escapeHtml(value) {
 }
 
 function nowStamp() {
-  const dt = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  const y = dt.getFullYear();
-  const m = pad(dt.getMonth() + 1);
-  const d = pad(dt.getDate());
-  const hh = pad(dt.getHours());
-  const mm = pad(dt.getMinutes());
-  return `${y}-${m}-${d} ${hh}:${mm}`;
+  const p = datePartsInTimeZone();
+  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`;
+}
+
+function injectCoBranding() {
+  const topbarBrand = document.querySelector(".topbar__brand");
+  if (!topbarBrand || topbarBrand.querySelector(".co-brand-pill")) return;
+  const badge = document.createElement("div");
+  badge.className = "co-brand-pill";
+  badge.innerHTML = `
+    <img class="co-brand-pill__logo" src="${escapeHtml(LABSICO_LOGO_URL)}" alt="LABSICO">
+    <span>${escapeHtml(CO_BRAND_TEXT)}</span>
+  `;
+  topbarBrand.appendChild(badge);
 }
 
 function createDefaultQuality() {
@@ -1536,6 +1544,9 @@ function exportConsultaReport() {
     .head h1 { margin: 0; font-size: 18px; line-height: 1.1; }
     .head .brand { margin: 3px 0 0; color: #3b5572; font-size: 10.5px; font-weight: 600; }
     .head .head-meta { margin: 0; color: #3b5572; font-size: 11px; text-align: right; }
+    .head-side { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .head-cobrand { display: inline-flex; align-items: center; gap: 6px; color: #4e6781; font-size: 10px; font-weight: 600; opacity: 0.9; }
+    .head-cobrand img { width: 14px; height: 14px; object-fit: contain; border-radius: 999px; }
     .meta { display: grid; grid-template-columns: repeat(5, minmax(95px, 1fr)); gap: 5px; margin-bottom: 8px; }
     .meta .item { border: 1px solid #d6e0eb; border-radius: 6px; padding: 5px 6px; background: #f8fbff; }
     .meta .k { font-size: 9px; color: #4d667f; text-transform: uppercase; line-height: 1; }
@@ -1575,7 +1586,13 @@ function exportConsultaReport() {
           <p class="brand">FIRME CONCRETOS</p>
         </div>
       </div>
-      <p class="head-meta">Generado: ${escapeHtml(reportDate)} | Archivo: ${escapeHtml(state.file || "-")}</p>
+      <div class="head-side">
+        <p class="head-meta">Generado: ${escapeHtml(reportDate)} | Archivo: ${escapeHtml(state.file || "-")}</p>
+        <div class="head-cobrand">
+          <img src="${escapeHtml(LABSICO_LOGO_URL)}" alt="LABSICO">
+          <span>${escapeHtml(CO_BRAND_TEXT)}</span>
+        </div>
+      </div>
     </div>
 
     <div class="meta">
@@ -1632,7 +1649,7 @@ function exportConsultaReport() {
       </article>
     </section>
 
-    <div class="sign">ForMix by Firme Concretos - Diseña-Dosifica-Calcula</div>
+    <div class="sign">${escapeHtml(CO_BRAND_TEXT)} - Diseña-Dosifica-Calcula</div>
   </div>
 </body>
 </html>`;
@@ -1901,6 +1918,9 @@ function buildDoserReportHtml(rawSnapshot, reportDate) {
     .head h1 { margin: 0; font-size: 16px; color: #0d3762; }
     .head .brand { margin: 2px 0 0; color: #39546e; font-size: 10px; font-weight: 600; }
     .head .sub { margin: 0; color: #39546e; font-size: 10.5px; text-align: right; }
+    .head-side { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .head-cobrand { display: inline-flex; align-items: center; gap: 6px; color: #4e6781; font-size: 10px; font-weight: 600; opacity: 0.9; }
+    .head-cobrand img { width: 14px; height: 14px; object-fit: contain; border-radius: 999px; }
     .meta-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 6px; }
     .meta-table th, .meta-table td { border: 1px solid #dce5ef; padding: 3px 5px; }
     .meta-table th { background: #edf4fb; text-align: left; width: 9%; font-weight: 600; }
@@ -1935,7 +1955,13 @@ function buildDoserReportHtml(rawSnapshot, reportDate) {
           <p class="brand">FIRME CONCRETOS</p>
         </div>
       </div>
-      <p class="sub">Generado: ${escapeHtml(reportDate)} | Archivo: ${escapeHtml(snap.file)}</p>
+      <div class="head-side">
+        <p class="sub">Generado: ${escapeHtml(reportDate)} | Archivo: ${escapeHtml(snap.file)}</p>
+        <div class="head-cobrand">
+          <img src="${escapeHtml(LABSICO_LOGO_URL)}" alt="LABSICO">
+          <span>${escapeHtml(CO_BRAND_TEXT)}</span>
+        </div>
+      </div>
     </div>
 
     <table class="meta-table">
@@ -2043,7 +2069,7 @@ function buildDoserReportHtml(rawSnapshot, reportDate) {
       <div class="total-line">Peso real total: ${escapeHtml(formatNum(snap.realWeight))}</div>
     </section>
 
-    <div class="sign">ForMix by Labsico - Dise&#241;a-Dosifica-Calcula</div>
+    <div class="sign">${escapeHtml(CO_BRAND_TEXT)} - Dise&#241;a-Dosifica-Calcula</div>
   </div>
 </body>
 </html>`;
@@ -3828,6 +3854,11 @@ window.AppGlobals = {
   appTimezone: APP_TIMEZONE,
   todayInAppTimezone,
   dateTimeInAppTimezone,
+  brandAssets: {
+    firmeLogoUrl: BRAND_LOGO_URL,
+    labsicoLogoUrl: LABSICO_LOGO_URL,
+    coBrandText: CO_BRAND_TEXT,
+  },
   escapeHtml,
   formatNum,
   canAccessView,
@@ -3847,4 +3878,5 @@ window.AppGlobals = {
 
 applyRoleAccessUi();
 switchView(defaultView());
+injectCoBranding();
 loadData();

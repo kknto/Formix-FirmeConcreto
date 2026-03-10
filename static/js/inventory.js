@@ -646,6 +646,18 @@
     window.print();
   }
 
+  function ensureDailyReportBrandMark() {
+    const footer = document.querySelector("#dailyReportModal .ui-dialog__actions");
+    if (!footer || footer.querySelector(".daily-brand-mark")) return;
+    const mark = document.createElement("div");
+    mark.className = "daily-brand-mark";
+    mark.innerHTML = `
+      <img src="/static/img/Labsico-Logo.jpg" alt="LABSICO">
+      <span>ForMIX by LABSICO</span>
+    `;
+    footer.insertBefore(mark, footer.firstChild);
+  }
+
   if (invGenDailyReportBtn) invGenDailyReportBtn.addEventListener("click", generateDailyReport);
 
   // Handlers para cerrar el modal del reporte
@@ -661,5 +673,7 @@
   if (invDailyReportDate) {
     invDailyReportDate.value = todayInAppTimezone();
   }
+
+  ensureDailyReportBrandMark();
 
 })(window.AppGlobals);

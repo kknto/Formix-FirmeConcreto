@@ -8,6 +8,7 @@
     state,
     todayInAppTimezone,
     dateTimeInAppTimezone,
+    brandAssets,
     escapeHtml,
     formatNum,
     canAccessView,
@@ -277,10 +278,50 @@ function renderCompareChart() {
 }
 
 function exportFleetReport() {
-  const w=window.open("","_blank"); if(!w) return;
-  let h=`<html><head><title>Reporte Flotilla</title><style>body{font-family:Arial,sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;margin:16px 0;}th,td{border:1px solid #ccc;padding:6px 8px;font-size:12px;}th{background:#eaf2fb;}h1{font-size:18px;}.num{text-align:right;}</style></head><body><h1>\ud83d\ude9b Reporte de Flotilla</h1><p>${new Date().toLocaleString()}</p><table><tr><th>Unidad</th><th>Chofer</th><th>Placa</th><th>Cargas</th><th>Litros</th><th>Costo</th><th>Km</th><th>km/L</th><th>$/km</th><th>Eficiencia</th></tr>`;
-  fleetState.summary.forEach(s=>{const a=Number(s.avg_kml)||0,e=Number(s.expected_kml)||0;const eff=e>0&&a>0?((a/e)*100).toFixed(0)+"%":"-";h+=`<tr><td>${s.unit_number}</td><td>${s.driver}</td><td>${s.plate}</td><td class="num">${s.total_records}</td><td class="num">${Number(s.total_liters).toFixed(1)}</td><td class="num">$${Number(s.total_cost).toFixed(2)}</td><td class="num">${Number(s.total_km).toFixed(0)}</td><td class="num">${a>0?a.toFixed(2):"-"}</td><td class="num">${Number(s.avg_cost_per_km)>0?"$"+Number(s.avg_cost_per_km).toFixed(2):"-"}</td><td class="num">${eff}</td></tr>`;});
-  h+=`</table></body></html>`; w.document.write(h); w.document.close(); w.print();
+  const w = window.open("", "_blank");
+  if (!w) return;
+  const firmeLogo = (brandAssets && brandAssets.firmeLogoUrl) || `${window.location.origin}/static/img/logo_firme_concreto.jpeg`;
+  const labsicoLogo = (brandAssets && brandAssets.labsicoLogoUrl) || `${window.location.origin}/static/img/Labsico-Logo.jpg`;
+  const coBrandText = (brandAssets && brandAssets.coBrandText) || "ForMIX by LABSICO";
+  let h = `<html><head><title>Reporte Flotilla</title><style>
+    body{font-family:Arial,sans-serif;padding:20px;color:#1a2c3f;}
+    .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:2px solid #0b4f8a;padding-bottom:8px;}
+    .brand{display:flex;align-items:center;gap:8px;}
+    .logo{width:42px;height:42px;object-fit:contain;border:1px solid #d5e1ee;border-radius:8px;background:#fff;padding:4px;}
+    h1{font-size:18px;margin:0;}
+    .sub{font-size:10.5px;color:#3b5572;margin:2px 0 0 0;font-weight:600;}
+    .meta{margin:0;text-align:right;color:#3b5572;}
+    .co{display:inline-flex;align-items:center;gap:6px;margin-top:4px;font-size:10px;color:#4e6781;font-weight:600;opacity:.9;}
+    .co img{width:14px;height:14px;object-fit:contain;border-radius:999px;}
+    table{width:100%;border-collapse:collapse;margin:16px 0;}
+    th,td{border:1px solid #ccc;padding:6px 8px;font-size:12px;}
+    th{background:#eaf2fb;} .num{text-align:right;}
+    .sign{margin-top:12px;text-align:center;color:#264767;font-size:11px;font-weight:600;border-top:1px solid #d3dfec;padding-top:8px;}
+  </style></head><body>
+  <div class="head">
+    <div class="brand">
+      <img class="logo" src="${esc(firmeLogo)}" alt="FIRME CONCRETOS">
+      <div>
+        <h1>Reporte de Flotilla</h1>
+        <p class="sub">FIRME CONCRETOS</p>
+      </div>
+    </div>
+    <div>
+      <p class="meta">${esc(dateTimeInAppTimezone())}</p>
+      <div class="co"><img src="${esc(labsicoLogo)}" alt="LABSICO"><span>${esc(coBrandText)}</span></div>
+    </div>
+  </div>
+  <table><tr><th>Unidad</th><th>Chofer</th><th>Placa</th><th>Cargas</th><th>Litros</th><th>Costo</th><th>Km</th><th>km/L</th><th>$/km</th><th>Eficiencia</th></tr>`;
+  fleetState.summary.forEach(s => {
+    const a = Number(s.avg_kml) || 0;
+    const e = Number(s.expected_kml) || 0;
+    const eff = e > 0 && a > 0 ? ((a / e) * 100).toFixed(0) + "%" : "-";
+    h += `<tr><td>${esc(s.unit_number)}</td><td>${esc(s.driver)}</td><td>${esc(s.plate)}</td><td class="num">${s.total_records}</td><td class="num">${Number(s.total_liters).toFixed(1)}</td><td class="num">$${Number(s.total_cost).toFixed(2)}</td><td class="num">${Number(s.total_km).toFixed(0)}</td><td class="num">${a > 0 ? a.toFixed(2) : "-"}</td><td class="num">${Number(s.avg_cost_per_km) > 0 ? "$" + Number(s.avg_cost_per_km).toFixed(2) : "-"}</td><td class="num">${eff}</td></tr>`;
+  });
+  h += `</table><div class="sign">${esc(coBrandText)} - Control Operativo de Flotilla</div></body></html>`;
+  w.document.write(h);
+  w.document.close();
+  w.print();
 }
 
 function showToast(msg, type) {
